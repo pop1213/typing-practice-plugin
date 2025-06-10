@@ -5,6 +5,7 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="D:/app/gradle-8.4" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />

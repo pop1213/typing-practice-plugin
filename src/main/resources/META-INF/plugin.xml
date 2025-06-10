@@ -1,15 +1,25 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.pop1213.typingpracticeplugin</id>
-    <name>typing-practice-plugin</name>
+    <name>typing-practice</name>
     <vendor>pop1213</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
+    <actions resource-bundle="messages.MyBundle">
+        <action id="TypingPracticeAction" class="com.github.pop1213.typingpracticeplugin.action.TypingPracticeAction">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <keyboard-shortcut first-keystroke="ctrl alt T" keymap="$default"/>
+        </action>
+    </actions>
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.pop1213.typingpracticeplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="com.github.pop1213.typingpracticeplugin.startup.MyProjectActivity" />
+        <postStartupActivity implementation="com.github.pop1213.typingpracticeplugin.startup.MyProjectActivity"/>
+
     </extensions>
+    <projectListeners>
+        <listener class="com.github.pop1213.typingpracticeplugin.listener.MyFileEditorManagerListener"
+                  topic="com.intellij.openapi.fileEditor.FileEditorManagerListener"/>
+    </projectListeners>
 </idea-plugin>

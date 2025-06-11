@@ -34,8 +34,6 @@ A simple and easy-to-use typing practice plugin designed specifically for progra
   Download the [latest release](https://github.com/pop1213/typing-practice-plugin/releases/latest) and install it manually using
   <kbd>Settings/Preferences</kbd> > <kbd>Plugins</kbd> > <kbd>⚙️</kbd> > <kbd>Install plugin from disk...</kbd>
 
-## [Unreleased]
-更新文档
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
 

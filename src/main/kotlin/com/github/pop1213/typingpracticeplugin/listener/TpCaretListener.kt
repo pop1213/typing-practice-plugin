@@ -17,7 +17,11 @@ class TpCaretListener: CaretListener{
     override fun caretPositionChanged(event: CaretEvent) {
         highlighter?.dispose()
         //获取当前光标位置字符
-        val currChar = event.editor.document.charsSequence.get(event.editor.caretModel.offset)
+        var currOffset =  event.editor.caretModel.offset
+        if(currOffset==event.editor.document.charsSequence.length){
+            return
+        }
+        val currChar = event.editor.document.charsSequence.get(currOffset)
         if (currChar.code == 10) {
             showCharAtCaretPosition(event.editor, '⏎')
         }else if (currChar.code == 32){

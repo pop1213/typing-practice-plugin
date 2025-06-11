@@ -19,6 +19,7 @@ import com.intellij.testFramework.LightVirtualFile
 import com.intellij.ui.JBColor
 import com.github.pop1213.typingpracticeplugin.TypingEditorToolbar
 import com.github.pop1213.typingpracticeplugin.listener.TpCaretListener
+import com.intellij.openapi.editor.ScrollType
 import java.awt.Font
 import java.awt.Graphics
 import java.io.IOException
@@ -48,15 +49,18 @@ class TypingPracticeAction : AnAction() {
                 val tempFileName = "${originalFile.nameWithoutExtension}.${originalFile.extension}"
                 val tempFile = LightVirtualFile(tempFileName, originalText)
                 val fileEditorManager = FileEditorManager.getInstance(project)
-                val typingEditors = fileEditorManager.openFile(tempFile, false)
+                val typingEditors = fileEditorManager.openFile(tempFile, true)
 
                 if (typingEditors.isNotEmpty() && typingEditors[0] is TextEditor) {
                     val typingEditor = (typingEditors[0] as TextEditor).editor
+                    //focus
+                    //val editor = FileEditorManager.getInstance(project).setSelectedEditor(tempFile)
+                    typingEditor.caretModel.moveToOffset(0)
+                    typingEditor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
                     typingEditor.putUserData(TP_EDITOR_KEY, true)
                     typingEditor.headerComponent = TypingEditorToolbar(typingEditor)
                     //在空格和回车处添加提示符号
                     typingEditor.caretModel.addCaretListener(TpCaretListener())
-
                 }
 
             } catch (ex: IOException) {

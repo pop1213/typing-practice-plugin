@@ -4,10 +4,8 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
-import com.intellij.psi.codeStyle.CodeStyleSettingsManager
 import com.github.pop1213.typingpracticeplugin.action.TP_EDITOR_KEY
 import com.intellij.application.options.CodeStyle
-import com.intellij.psi.PsiFile
 import com.intellij.psi.PsiManager
 
 class ActionEditorTapHandler(private val originHandler: EditorActionHandler) : EditorActionHandler() {

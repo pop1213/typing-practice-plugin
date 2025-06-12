@@ -74,7 +74,9 @@ class TypingEditorToolbar(
 
         editor.contentComponent.addFocusListener(object : FocusAdapter() {
             override fun focusLost(e: FocusEvent?) {
-               stopTyping()
+               if(e?.oppositeComponent!=startBtn){
+                   stopTyping()
+               }
             }
         })
 

@@ -20,13 +20,20 @@ class ActionEditorEnterHandler(private val originHandler: EditorActionHandler) :
         }
     }
     private fun handleEnterKey(editor: EditorEx) {
-        //没有开始按enter键开始
+
         var typingAction = editor.getUserData(TYPING_ACTION)
+        var offset = editor.caretModel.currentCaret.offset
+        //如果打完所有行，按回车自动结束
+        if (offset >= editor.document.textLength) {
+            typingAction?.stopTyping()
+            return
+        }
+        //没有开始按enter键开始
         if (typingAction?.isTyping != true) {
             typingAction?.startTyping()
             return
         }
-        var offset = editor.caretModel.currentCaret.offset
+
         var currentChar = editor.document.getText(TextRange.create(offset, offset + 1)).get(0)
 //        if(isCaretInComment(editor, offset)){
 //            println(currentChar)

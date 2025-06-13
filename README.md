@@ -10,7 +10,7 @@ A simple and easy-to-use typing practice plugin designed specifically for progra
   <li>Use any source code within the project as typing content.</li>
   <li>Display typing speed, accuracy, and related information in real time.</li>
 </ul>
-适合程序员练习打字摸鱼的小插件，在编辑器页面右键打开菜单，选择“练习打字”，可以实时显示打字速度、准确率等信息。
+适合程序猿练习打字摸鱼的小插件，在编辑器页面右键打开菜单，选择“练习打字”，可以实时显示打字速度、准确率等信息。
 <br>
 <strong>Usage Instructions</strong>: Right-click in any editor, then click "Practice Typing" in the pop-up menu to start.
 <!-- Plugin description end -->

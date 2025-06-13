@@ -20,6 +20,7 @@ import com.intellij.ui.JBColor
 import com.github.pop1213.typingpracticeplugin.TypingEditorToolbar
 import com.github.pop1213.typingpracticeplugin.listener.TpCaretListener
 import com.intellij.openapi.editor.ScrollType
+import com.intellij.openapi.editor.ex.EditorEx
 import java.awt.Font
 import java.awt.Graphics
 import java.io.IOException
@@ -53,6 +54,7 @@ class TypingPracticeAction : AnAction() {
 
                 if (typingEditors.isNotEmpty() && typingEditors[0] is TextEditor) {
                     val typingEditor = (typingEditors[0] as TextEditor).editor
+                    (typingEditor as EditorEx)?.isViewer = true
                     //focus
                     //val editor = FileEditorManager.getInstance(project).setSelectedEditor(tempFile)
                     typingEditor.caretModel.moveToOffset(0)
@@ -76,45 +78,10 @@ class TypingPracticeAction : AnAction() {
     override fun update(e: AnActionEvent) {
         val project = e.project
         val editor = e.getData(PlatformDataKeys.EDITOR)
-        val file = e.getData(PlatformDataKeys.VIRTUAL_FILE)
-
         e.presentation.isEnabledAndVisible =
-            project != null && editor != null && file != null && isValidSourceFile(file) && editor.getUserData(
+            project != null && editor != null  && editor.getUserData(
                 TP_EDITOR_KEY
             )==null
-    }
-
-
-    private fun showCharAtCaretPosition(editor: Editor, c: Char) {
-        var markupModel = editor.markupModel
-        val caretOffset: Int = editor.caretModel.offset
-        highlighter = markupModel.addRangeHighlighter(
-            caretOffset, caretOffset,
-            HighlighterLayer.SELECTION + 1,
-            null,
-            HighlighterTargetArea.EXACT_RANGE
-        );
-        highlighter?.setCustomRenderer { p0: Editor, r: RangeHighlighter, g: Graphics ->
-            //获取当前光标坐标
-            val visualPosition = editor.caretModel.visualPosition
-            val r = editor.visualPositionToXY(visualPosition)
-
-            //获取当前编辑器的字体
-            val font: Font = editor.colorsScheme.getFont(EditorFontType.PLAIN)
-            g.font = font
-            //和当前行对齐
-            g.color = JBColor.RED
-
-            var ascent = p0.ascent
-
-            g.drawString(c.toString(), r.x, r.y + ascent)
-            true
-        }
-
-        //1s后自动删除
-//        AppExecutorUtil.getAppScheduledExecutorService().scheduleWithFixedDelay({
-//            markupModel.removeHighlighter(addRangeHighlighter)
-//        }, 1, 1, TimeUnit.SECONDS)
     }
 
 }

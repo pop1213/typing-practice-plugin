@@ -1,6 +1,8 @@
 package com.github.pop1213.typingpracticeplugin.handler
 
 import com.github.pop1213.typingpracticeplugin.HighlightHelper
+import com.github.pop1213.typingpracticeplugin.TYPING_ACTION
+import com.github.pop1213.typingpracticeplugin.action.TP_EDITOR_KEY
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
@@ -8,8 +10,15 @@ import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.util.TextRange
-import com.github.pop1213.typingpracticeplugin.TYPING_ACTION
-import com.github.pop1213.typingpracticeplugin.action.TP_EDITOR_KEY
+import com.intellij.psi.PsiComment
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiManager
+import com.intellij.psi.PsiWhiteSpace
+
+import com.intellij.psi.util.PsiTreeUtil
+import com.intellij.psi.util.elementType
+import com.intellij.refactoring.suggested.endOffset
+import com.intellij.refactoring.suggested.startOffset
 
 class ActionEditorEnterHandler(private val originHandler: EditorActionHandler) : EditorActionHandler() {
     override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
@@ -22,45 +31,60 @@ class ActionEditorEnterHandler(private val originHandler: EditorActionHandler) :
     private fun handleEnterKey(editor: EditorEx) {
 
         var typingAction = editor.getUserData(TYPING_ACTION)
-        var offset = editor.caretModel.currentCaret.offset
-        //如果打完所有行，按回车自动结束
-        if (offset >= editor.document.textLength) {
-            typingAction?.stopTyping()
-            return
-        }
         //没有开始按enter键开始
         if (typingAction?.isTyping != true) {
             typingAction?.startTyping()
             return
         }
 
-        var currentChar = editor.document.getText(TextRange.create(offset, offset + 1)).get(0)
-//        if(isCaretInComment(editor, offset)){
-//            println(currentChar)
-//        }
-
-        if (currentChar.code != 10) {
-            typingAction?.onInput(false)
+        var offset = editor.caretModel.currentCaret.offset
+        //如果打完所有行，按回车自动结束
+        if (offset >= editor.document.textLength) {
+            typingAction?.stopTyping()
             return
         }
-        typingAction?.onInput(true)
-        //移动光标到下一个非空白位置
-        HighlightHelper.removeHighlight(editor, offset, offset + 1)
-        EditorModificationUtil.deleteSelectedText(editor)
-        val nextLineStartOffset =
-            editor.document.getLineStartOffset(editor.caretModel.currentCaret.logicalPosition.line + 1)
-        val nextLineEndOffset =
-            editor.document.getLineEndOffset(editor.caretModel.currentCaret.logicalPosition.line + 1)
-        val text = editor.document.getText(TextRange(nextLineStartOffset, nextLineEndOffset))
-        var caretPosOffset = 0
-        for (i in text.indices) {
-            if (text[i].code != 32) {
-                break
-            }
-            caretPosOffset++;
+
+        var currentChar = editor.document.getText(TextRange.create(offset, offset + 1)).get(0)
+        if (currentChar.code != 10) {
+            typingAction?.onInput(false)
+            HighlightHelper.createRedHighlight(editor, offset, offset + 1)
+        }else{
+            typingAction?.onInput(true)
+            HighlightHelper.removeHighlight(editor, offset, offset + 1)
         }
-        editor.caretModel.moveToOffset(nextLineStartOffset + caretPosOffset)
-        EditorModificationUtil.scrollToCaret(editor)
-        editor.selectionModel.removeSelection()
+        skipWhiteSpaceAndComment(editor)
+    }
+
+    private fun skipWhiteSpaceAndComment(editor: Editor) {
+        val offset = editor.caretModel.offset
+        var psiFile = PsiManager.getInstance(editor.project!!).findFile(editor.virtualFile)
+        var element = psiFile!!.findElementAt(offset)
+        println(element?.node?.elementType)
+
+        editor.caretModel.moveToOffset(findNexTypingElementStartOffset(psiFile, offset))
+    }
+
+    private fun findNexTypingElementStartOffset(psiFile: PsiFile, startOffset: Int): Int {
+        var offset = startOffset
+        val fileLength = psiFile.textLength
+
+        while (offset < fileLength) {
+            val element = psiFile.findElementAt(offset)
+            if (element == null) {
+                offset++
+                continue
+            }
+            // 跳过注释和空白
+            if (element is PsiWhiteSpace
+                || element is PsiComment
+                //  跳过文档注释，暂时没发现更好的api
+                || element?.elementType?.debugName?.uppercase()?.contains("DOC") == true) {
+                offset = element.textRange.endOffset
+                continue
+            }
+            // 找到非注释、非空白的 PSI 元素
+            return element.textRange.startOffset
+        }
+        return fileLength
     }
 }

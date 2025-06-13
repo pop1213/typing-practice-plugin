@@ -1,8 +1,8 @@
 # typing-practice-plugin
 
 ![Build](https://github.com/pop1213/typing-practice-plugin/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/27611-code-typing-practice)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/MARKETPLACE_ID.svg)](https://plugins.jetbrains.com/plugin/27611-code-typing-practice)
+[![Version](https://img.shields.io/jetbrains/plugin/v/27611-code-typing-practice.svg)](https://plugins.jetbrains.com/plugin/27611-code-typing-practice)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/27611-code-typing-practice.svg)](https://plugins.jetbrains.com/plugin/27611-code-typing-practice)
 
 <!-- Plugin description -->
 A simple and easy-to-use typing practice plugin designed specifically for programmers.

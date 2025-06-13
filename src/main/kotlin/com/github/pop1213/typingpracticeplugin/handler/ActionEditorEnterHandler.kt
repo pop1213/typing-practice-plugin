@@ -78,7 +78,7 @@ class ActionEditorEnterHandler(private val originHandler: EditorActionHandler) :
             if (element is PsiWhiteSpace
                 || element is PsiComment
                 //  跳过文档注释，暂时没发现更好的api
-                || element?.elementType?.debugName?.uppercase()?.contains("DOC") == true) {
+                || element?.elementType?.toString()?.uppercase()?.contains("DOC") == true) {
                 offset = element.textRange.endOffset
                 continue
             }

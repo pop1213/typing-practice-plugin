@@ -7,16 +7,15 @@ import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Caret
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.EditorModificationUtil
+import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.PsiComment
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiManager
-import com.intellij.psi.PsiWhiteSpace
+import com.intellij.psi.*
 
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.elementType
+import com.intellij.psi.util.parents
 import com.intellij.refactoring.suggested.endOffset
 import com.intellij.refactoring.suggested.startOffset
 
@@ -62,6 +61,7 @@ class ActionEditorEnterHandler(private val originHandler: EditorActionHandler) :
         println(element?.node?.elementType)
 
         editor.caretModel.moveToOffset(findNexTypingElementStartOffset(psiFile, offset))
+        editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
     }
 
     private fun findNexTypingElementStartOffset(psiFile: PsiFile, startOffset: Int): Int {
@@ -75,10 +75,9 @@ class ActionEditorEnterHandler(private val originHandler: EditorActionHandler) :
                 continue
             }
             // 跳过注释和空白
-            if (element is PsiWhiteSpace
-                || element is PsiComment
-                //  跳过文档注释，暂时没发现更好的api
-                || element?.elementType?.toString()?.uppercase()?.contains("DOC") == true) {
+            if ((element is PsiWhiteSpace
+                        || element is PsiComment) || isDocumentComment(element, 4)
+            ) {
                 offset = element.textRange.endOffset
                 continue
             }
@@ -87,4 +86,22 @@ class ActionEditorEnterHandler(private val originHandler: EditorActionHandler) :
         }
         return fileLength
     }
+
+    //递归查找是否为文档注释
+    private fun isDocumentComment(element: PsiElement,depth: Int): Boolean {
+        if(element==null){
+            return false
+        }
+        if(element.elementType.toString().uppercase().contains("DOC")){
+            return true
+        }
+
+        if(depth <= 1){
+            return element.elementType.toString().uppercase().contains("DOC")
+        }
+        return element.parents(false).any{
+            isDocumentComment(it,depth-1)
+        }
+    }
+
 }

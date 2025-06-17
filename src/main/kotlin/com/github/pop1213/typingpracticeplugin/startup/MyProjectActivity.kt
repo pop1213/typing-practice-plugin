@@ -17,7 +17,7 @@ class MyProjectActivity : ProjectActivity {
 
     override suspend fun execute(project: Project) {
 
-        EditorFactory.getInstance().addEditorFactoryListener(TpEditorFactoryListener(),project.actualComponentManager)
+        EditorFactory.getInstance().addEditorFactoryListener(TpEditorFactoryListener(),project)
 
         val enterActionHandler = EditorActionManager.getInstance().getActionHandler(IdeActions.ACTION_EDITOR_ENTER)
         EditorActionManager.getInstance().setActionHandler(IdeActions.ACTION_EDITOR_ENTER, ActionEditorEnterHandler(enterActionHandler))

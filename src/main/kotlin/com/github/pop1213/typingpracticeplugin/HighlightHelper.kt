@@ -7,9 +7,10 @@ import com.intellij.openapi.editor.markup.EffectType
 import com.intellij.openapi.editor.markup.HighlighterLayer
 import com.intellij.openapi.editor.markup.RangeHighlighter
 import com.intellij.openapi.editor.markup.TextAttributes
+import com.intellij.ui.JBColor
 
 object HighlightHelper {
-    val colorsScheme = com.intellij.openapi.editor.colors.EditorColorsManager.getInstance().globalScheme
+    private val colorsScheme = com.intellij.openapi.editor.colors.EditorColorsManager.getInstance().globalScheme
     private val GREEN_HIGHLIGHT_KEY = TextAttributesKey.createTextAttributesKey(
         "TYPING_PRACTICE_CORRECT",
         DefaultLanguageHighlighterColors.STRING
@@ -24,14 +25,14 @@ object HighlightHelper {
         // 注册自定义高亮属性
         // 正确字符高亮 - 绿色背景
         val greenAttributes = TextAttributes()
-        greenAttributes.backgroundColor = java.awt.Color(0xCC, 0xFF, 0xCC)
+        greenAttributes.backgroundColor = JBColor(java.awt.Color(0xCC, 0xFF, 0xCC),java.awt.Color(0x2D, 0x5D, 0x2))
         colorsScheme.setAttributes(GREEN_HIGHLIGHT_KEY, greenAttributes)
 
         // 错误字符高亮 - 红色背景和波浪线
         val redAttributes = TextAttributes()
 
         //e63d3d
-        redAttributes.backgroundColor = java.awt.Color(0xFF, 0xCC, 0xCC)
+        redAttributes.backgroundColor = JBColor(java.awt.Color(0xFF, 0xCC, 0xCC),java.awt.Color(0x8B, 0x00, 0x00))
         redAttributes.effectType = EffectType.WAVE_UNDERSCORE
         redAttributes.effectColor = java.awt.Color.RED
         colorsScheme.setAttributes(RED_HIGHLIGHT_KEY, redAttributes)
@@ -64,7 +65,7 @@ object HighlightHelper {
             }
         }
         if (!hasCurrentHighlighter) {
-            val highlighter = editor.markupModel.addRangeHighlighter(
+            editor.markupModel.addRangeHighlighter(
                 textAttributesKey,
                 startOffset,
                 endOffset,

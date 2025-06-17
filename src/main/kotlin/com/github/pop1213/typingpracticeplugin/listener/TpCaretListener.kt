@@ -17,11 +17,11 @@ class TpCaretListener: CaretListener{
     override fun caretPositionChanged(event: CaretEvent) {
         highlighter?.dispose()
         //获取当前光标位置字符
-        var currOffset =  event.editor.caretModel.offset
+        val currOffset =  event.editor.caretModel.offset
         if(currOffset==event.editor.document.charsSequence.length){
             return
         }
-        val currChar = event.editor.document.charsSequence.get(currOffset)
+        val currChar = event.editor.document.charsSequence[currOffset]
         if (currChar.code == 10) {
             showCharAtCaretPosition(event.editor, '⏎')
         }else if (currChar.code == 32){
@@ -30,18 +30,18 @@ class TpCaretListener: CaretListener{
     }
 
     private fun showCharAtCaretPosition(editor: Editor, c: Char) {
-        var markupModel = editor.markupModel
+        val markupModel = editor.markupModel
         val caretOffset: Int = editor.caretModel.offset
         highlighter = markupModel.addRangeHighlighter(
             caretOffset, caretOffset,
             HighlighterLayer.SELECTION + 1,
             null,
             HighlighterTargetArea.EXACT_RANGE
-        );
-        highlighter?.setCustomRenderer { p0: Editor, r: RangeHighlighter, g: Graphics ->
+        )
+        highlighter?.setCustomRenderer { p0: Editor, _: RangeHighlighter, g: Graphics ->
             //获取当前光标坐标
             val visualPosition = editor.caretModel.visualPosition
-            val r = editor.visualPositionToXY(visualPosition)
+            val pos = editor.visualPositionToXY(visualPosition)
 
             //获取当前编辑器的字体
             val font: Font = editor.colorsScheme.getFont(EditorFontType.PLAIN)
@@ -49,10 +49,9 @@ class TpCaretListener: CaretListener{
             //和当前行对齐
             g.color = JBColor.RED
 
-            var ascent = p0.ascent
+            val ascent = p0.ascent
 
-            g.drawString(c.toString(), r.x, r.y + ascent)
-            true
+            g.drawString(c.toString(), pos.x, pos.y + ascent)
         }
 
 

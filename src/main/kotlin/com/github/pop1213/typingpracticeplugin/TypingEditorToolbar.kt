@@ -25,7 +25,7 @@ class TypingEditorToolbar(
     private val wpmLabel = createValueLabel("0")
     private val correctLabel = createValueLabel("0")
     private val accuracyLabel = createValueLabel("0.0%")
-    private val startBtn = createIconButton(AllIcons.Actions.Execute, "Start");
+    private val startBtn = createIconButton(AllIcons.Actions.Execute, "Start")
 
     init {
         layout = FlowLayout(FlowLayout.LEFT)
@@ -84,7 +84,7 @@ class TypingEditorToolbar(
     }
 
 
-    fun updateStats() {
+    private fun updateStats() {
         SwingUtilities.invokeLater {
             timeLabel.text = formatTime(typingSession.stats.elapsedSeconds)
             inputLabel.text = typingSession.stats.inputCount.toString()
@@ -138,7 +138,7 @@ class TypingEditorToolbar(
         startBtn.toolTipText = "Pause"
         startBtn.icon = AllIcons.Actions.Pause
         //startSession()
-        typingSession.start();
+        typingSession.start()
         updateStats()
     }
 
@@ -147,12 +147,12 @@ class TypingEditorToolbar(
         startBtn.toolTipText = "Start"
         startBtn.icon = AllIcons.Actions.Execute
         //startSession()
-        typingSession.stop();
+        typingSession.stop()
         updateStats()
     }
 
     override fun resetTyping() {
-        typingSession.restart();
+        typingSession.restart()
         updateStats()
     }
     override fun onInput(isCorrect: Boolean) {

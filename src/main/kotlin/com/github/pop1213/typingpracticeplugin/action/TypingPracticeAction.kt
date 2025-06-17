@@ -1,14 +1,15 @@
 package com.github.pop1213.typingpracticeplugin.action
 
+import com.github.pop1213.typingpracticeplugin.TypingEditorToolbar
+import com.github.pop1213.typingpracticeplugin.listener.TpCaretListener
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.colors.EditorFontType
-import com.intellij.openapi.editor.markup.HighlighterLayer
-import com.intellij.openapi.editor.markup.HighlighterTargetArea
-import com.intellij.openapi.editor.markup.RangeHighlighter
+import com.intellij.openapi.editor.ScrollType
+import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.fileEditor.TextEditor
 import com.intellij.openapi.project.Project
@@ -16,27 +17,14 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.LightVirtualFile
-import com.intellij.ui.JBColor
-import com.github.pop1213.typingpracticeplugin.TypingEditorToolbar
-import com.github.pop1213.typingpracticeplugin.listener.TpCaretListener
-import com.intellij.openapi.editor.ScrollType
-import com.intellij.openapi.editor.ex.EditorEx
-import java.awt.Font
-import java.awt.Graphics
 import java.io.IOException
+
 internal val TP_EDITOR_KEY = Key.create<Boolean>("TP_EDITOR_KEY")
 class TypingPracticeAction : AnAction() {
-    private  var highlighter: RangeHighlighter? = null
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
         val editor = e.getData(PlatformDataKeys.EDITOR) ?: return
         val file = e.getData(PlatformDataKeys.VIRTUAL_FILE) ?: return
-
-        if (!isValidSourceFile(file)) {
-            Messages.showInfoMessage(project, "请选择有效的源码文件", "提示")
-            return
-        }
-
         openTypingPracticeEditor(project, editor, file)
     }
 
@@ -54,9 +42,7 @@ class TypingPracticeAction : AnAction() {
 
                 if (typingEditors.isNotEmpty() && typingEditors[0] is TextEditor) {
                     val typingEditor = (typingEditors[0] as TextEditor).editor
-                    (typingEditor as EditorEx)?.isViewer = true
-                    //focus
-                    //val editor = FileEditorManager.getInstance(project).setSelectedEditor(tempFile)
+                    (typingEditor as EditorEx).isViewer = true
                     typingEditor.caretModel.moveToOffset(0)
                     typingEditor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
                     typingEditor.putUserData(TP_EDITOR_KEY, true)
@@ -71,10 +57,6 @@ class TypingPracticeAction : AnAction() {
         }
     }
 
-    private fun isValidSourceFile(file: VirtualFile): Boolean {
-        val fileType = file.fileType
-        return !fileType.isBinary
-    }
     override fun update(e: AnActionEvent) {
         val project = e.project
         val editor = e.getData(PlatformDataKeys.EDITOR)
@@ -84,4 +66,5 @@ class TypingPracticeAction : AnAction() {
             )==null
     }
 
+    override fun getActionUpdateThread() = ActionUpdateThread.EDT
 }

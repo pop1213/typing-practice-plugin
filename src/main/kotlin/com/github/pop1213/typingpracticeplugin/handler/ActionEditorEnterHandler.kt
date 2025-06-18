@@ -1,6 +1,7 @@
 package com.github.pop1213.typingpracticeplugin.handler
 
 import com.github.pop1213.typingpracticeplugin.HighlightHelper
+import com.github.pop1213.typingpracticeplugin.PsiElementUtils
 import com.github.pop1213.typingpracticeplugin.TYPING_ACTION
 import com.github.pop1213.typingpracticeplugin.action.TP_EDITOR_KEY
 import com.intellij.openapi.actionSystem.DataContext
@@ -39,19 +40,26 @@ class ActionEditorEnterHandler(private val originHandler: EditorActionHandler) :
         }
         val psiFile = PsiManager.getInstance(editor.project!!).findFile(editor.virtualFile)
         var findElementAt = psiFile?.findElementAt(offset)
-        if(!isCommentOrWhiteSpace(findElementAt,4)){
-            val currentChar = editor.document.getText(TextRange.create(offset, offset + 1))[0]
-            if (currentChar.code != 10) {
-                typingAction.onInput(false)
-                HighlightHelper.createRedHighlight(editor, offset, offset + 1)
-            }else{
-                typingAction.onInput(true)
-                HighlightHelper.removeHighlight(editor, offset, offset + 1)
-            }
+        val typedCorrect = editor.document.getText(TextRange.create(offset, offset + 1))[0].code==10
+
+        //只要是在注释中就一律跳过
+        //如果不是注释中，正确输入，清除高亮，跳过，否则显示错误高亮
+        if(PsiElementUtils.isComment(findElementAt,4)){
+            skipToNextTypingElement(editor, psiFile!!, offset)
         }else{
-            editor.caretModel.moveToOffset(findNexTypingElementStartOffset(psiFile!!, offset))
-            editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
+            typingAction.onInput(typedCorrect)
+            if(typedCorrect){
+                HighlightHelper.removeHighlight(editor, offset, offset + 1)
+                skipToNextTypingElement(editor, psiFile!!, offset)
+            }else{
+                HighlightHelper.createRedHighlight(editor, offset, offset + 1)
+            }
         }
+    }
+
+    private fun skipToNextTypingElement(editor: EditorEx, psiFile: PsiFile, offset: Int) {
+        editor.caretModel.moveToOffset(findNexTypingElementStartOffset(psiFile, offset))
+        editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
     }
 
     private fun findNexTypingElementStartOffset(psiFile: PsiFile, startOffset: Int): Int {
@@ -65,9 +73,7 @@ class ActionEditorEnterHandler(private val originHandler: EditorActionHandler) :
                 continue
             }
             // 跳过注释和空白
-            if ((element is PsiWhiteSpace
-                        || element is PsiComment) || isDocumentCommentByRecursive(element, 4)
-            ) {
+            if ((element is PsiWhiteSpace || PsiElementUtils.isComment(element, 4))) {
                 offset = element.textRange.endOffset
                 continue
             }
@@ -77,25 +83,6 @@ class ActionEditorEnterHandler(private val originHandler: EditorActionHandler) :
         return fileLength
     }
 
-    private fun isCommentOrWhiteSpace(element: PsiElement?,depth: Int): Boolean {
-       return element is PsiWhiteSpace
-                || element is PsiComment || isDocumentCommentByRecursive(element, 4)
-    }
-    //递归查找是否为文档注释
-    private fun isDocumentCommentByRecursive(element: PsiElement?,depth: Int): Boolean {
-        if(element == null){
-            return false
-        }
-        if(element.elementType.toString().uppercase().contains("DOC")){
-            return true
-        }
 
-        if(depth <= 1){
-            return element.elementType.toString().uppercase().contains("DOC")
-        }
-        return element.parents(false).any{
-            isDocumentCommentByRecursive(it,depth-1)
-        }
-    }
 
 }

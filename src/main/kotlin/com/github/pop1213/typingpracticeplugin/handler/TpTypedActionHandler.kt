@@ -1,6 +1,7 @@
 package com.github.pop1213.typingpracticeplugin.handler
 
 import com.github.pop1213.typingpracticeplugin.HighlightHelper
+import com.github.pop1213.typingpracticeplugin.PsiElementUtils
 import com.github.pop1213.typingpracticeplugin.TYPING_ACTION
 import com.github.pop1213.typingpracticeplugin.action.TP_EDITOR_KEY
 import com.intellij.openapi.actionSystem.DataContext
@@ -8,6 +9,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.util.TextRange
+import com.intellij.psi.PsiManager
 
 
 class TpTypedActionHandler(private val originRawHandler: TypedActionHandler) : TypedActionHandler {
@@ -22,15 +24,18 @@ class TpTypedActionHandler(private val originRawHandler: TypedActionHandler) : T
     private fun handleCharTyped(editor: EditorEx, typedChar: Char) {
         //未开始按任意键开始
         //not null
-
         val typingAction = editor.getUserData(TYPING_ACTION)
         if (typingAction?.isTyping != true) {
             typingAction?.startTyping()
             return
         }
         val offset = editor.caretModel.currentCaret.offset
+        val psiFile = PsiManager.getInstance(editor.project!!).findFile(editor.virtualFile)
+        val findElementAt = psiFile?.findElementAt(offset)
+        if(PsiElementUtils.isComment(findElementAt,4)){
+            return
+        }
         val charInDoc = editor.document.getText(TextRange.create(offset, offset + 1))
-
         if (charInDoc == typedChar.toString()) {
             HighlightHelper.createGreenHighlight(editor, offset, offset + 1)
             editor.caretModel.moveToOffset(offset + 1)

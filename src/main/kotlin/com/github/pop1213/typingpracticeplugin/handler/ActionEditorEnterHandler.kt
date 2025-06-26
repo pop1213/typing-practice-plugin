@@ -11,9 +11,9 @@ import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.actionSystem.EditorActionHandler
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.util.TextRange
-import com.intellij.psi.*
-import com.intellij.psi.util.elementType
-import com.intellij.psi.util.parents
+import com.intellij.psi.PsiFile
+import com.intellij.psi.PsiManager
+import com.intellij.psi.PsiWhiteSpace
 
 class ActionEditorEnterHandler(private val originHandler: EditorActionHandler) : EditorActionHandler() {
     override fun doExecute(editor: Editor, caret: Caret?, dataContext: DataContext?) {
@@ -39,7 +39,7 @@ class ActionEditorEnterHandler(private val originHandler: EditorActionHandler) :
             return
         }
         val psiFile = PsiManager.getInstance(editor.project!!).findFile(editor.virtualFile)
-        var findElementAt = psiFile?.findElementAt(offset)
+        val findElementAt = psiFile?.findElementAt(offset)
         val typedCorrect = editor.document.getText(TextRange.create(offset, offset + 1))[0].code==10
 
         //只要是在注释中就一律跳过

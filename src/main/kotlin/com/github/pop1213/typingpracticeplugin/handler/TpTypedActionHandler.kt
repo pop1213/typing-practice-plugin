@@ -6,6 +6,7 @@ import com.github.pop1213.typingpracticeplugin.TYPING_ACTION
 import com.github.pop1213.typingpracticeplugin.action.TP_EDITOR_KEY
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.ScrollType
 import com.intellij.openapi.editor.actionSystem.TypedActionHandler
 import com.intellij.openapi.editor.ex.EditorEx
 import com.intellij.openapi.util.TextRange
@@ -39,6 +40,7 @@ class TpTypedActionHandler(private val originRawHandler: TypedActionHandler) : T
         if (charInDoc == typedChar.toString()) {
             HighlightHelper.createGreenHighlight(editor, offset, offset + 1)
             editor.caretModel.moveToOffset(offset + 1)
+            editor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
             typingAction.onInput(true)
         } else {
             HighlightHelper.createRedHighlight(editor, offset, offset + 1)

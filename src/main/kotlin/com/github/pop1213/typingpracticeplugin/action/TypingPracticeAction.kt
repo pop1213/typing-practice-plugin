@@ -47,6 +47,7 @@ class TypingPracticeAction : AnAction() {
                     typingEditor.scrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
                     typingEditor.putUserData(TP_EDITOR_KEY, true)
                     typingEditor.headerComponent = TypingEditorToolbar(typingEditor)
+                    typingEditor.permanentHeaderComponent = typingEditor.headerComponent
                     //在空格和回车处添加提示符号
                     typingEditor.caretModel.addCaretListener(TpCaretListener())
                 }
